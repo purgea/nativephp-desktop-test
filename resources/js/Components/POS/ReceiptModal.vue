@@ -10,9 +10,18 @@ const props = defineProps({
     tableNumber: Number,
     checkNumber: Number,
     serverName: String,
+    paymentMethod: { type: String, default: null },
+    afterPayment: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'new-sale']);
+
+const methodLabel = {
+    cash: 'Cash',
+    credit: 'Credit Card',
+    debit: 'Debit Card',
+    gift: 'Gift Card',
+};
 
 const now = new Date();
 const dateStr = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
@@ -95,6 +104,11 @@ const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-di
                     <span>${{ amountDue.toFixed(2) }}</span>
                 </div>
 
+                <div v-if="paymentMethod" class="flex justify-between text-[10px] text-gray-500 mt-1">
+                    <span>Payment</span>
+                    <span class="font-semibold">{{ methodLabel[paymentMethod] || paymentMethod }}</span>
+                </div>
+
                 <div class="border-t border-dashed border-gray-300 my-3"></div>
 
                 <div class="text-center text-[9px] text-gray-400">
@@ -110,6 +124,9 @@ const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-di
                 </button>
                 <button @click="$emit('close')" class="px-6 py-2 text-xs font-bold text-white bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
                     Print
+                </button>
+                <button v-if="afterPayment" @click="$emit('new-sale')" class="px-6 py-2 text-xs font-bold text-white bg-emerald-700 rounded-lg hover:bg-emerald-600 transition-colors">
+                    New Sale
                 </button>
             </div>
         </div>

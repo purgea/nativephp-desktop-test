@@ -48,6 +48,16 @@ const showReceiptModal = ref(false);
 const showHeldOrdersModal = ref(false);
 const numpadMode = ref('typeIn'); // 'typeIn', 'qty', 'openFood', 'openBar'
 
+// Editable categories (for price management)
+const editableCategories = ref(props.categories.map(cat => ({
+    ...cat,
+    items: cat.items.map(item => ({ ...item })),
+})));
+
+// Receipt-after-payment tracking
+const postPaymentReceipt = ref(false);
+const lastPaymentMethod = ref(null);
+
 // Held orders
 const heldOrders = ref([]);
 
@@ -56,13 +66,13 @@ const sessionChecks = ref(0);
 const sessionTotal = ref(0);
 
 // ─── Employees & Auth ────────────────────────────────────────
-const employees = [
+const employees = ref([
     { id: '1',  name: 'Wolfgang',      role: 'Manager' },
     { id: '7',  name: 'Marcus Webb',   role: 'Host' },
     { id: '15', name: 'Sarah Miller',  role: 'Server' },
     { id: '23', name: 'Emma Chen',     role: 'Server' },
     { id: '50', name: 'Jake Torres',   role: 'Bartender' },
-];
+]);
 
 const isLoggedIn = ref(false);
 const currentEmployee = ref(null);
@@ -73,7 +83,7 @@ const managerInTerminal = ref(false);
 const isManager = computed(() => currentEmployee.value?.role === 'Manager');
 
 const liveEmployee = computed(() =>
-    loginInput.value ? (employees.find(e => e.id === loginInput.value) ?? null) : null
+    loginInput.value ? (employees.value.find(e => e.id === loginInput.value) ?? null) : null
 );
 
 function pressLoginDigit(d) {
@@ -88,7 +98,7 @@ function backspaceLogin() {
 }
 
 function submitLogin() {
-    const emp = employees.find(e => e.id === loginInput.value);
+    const emp = employees.value.find(e => e.id === loginInput.value);
     if (emp) {
         currentEmployee.value = emp;
         isLoggedIn.value = true;
@@ -412,13 +422,24 @@ function processPayment(method, tipAmount, giftCardInfo) {
     gratuity.value = tipAmount || 0;
     sessionChecks.value++;
     sessionTotal.value += amountDue.value;
+    lastPaymentMethod.value = method;
+    postPaymentReceipt.value = true;
     showPaymentModal.value = false;
     if (method === 'gift' && giftCardInfo) {
         notify(`$${giftCardInfo.charged.toFixed(2)} charged to gift card ${giftCardInfo.serial} (remaining: $${giftCardInfo.remainingBalance.toFixed(2)})`, 'success');
     } else {
         notify(`Payment of $${amountDue.value.toFixed(2)} processed via ${method}`, 'success');
     }
-    setTimeout(() => newSale(), 1500);
+    showReceiptModal.value = true;
+}
+
+function closeReceipt() {
+    showReceiptModal.value = false;
+    if (postPaymentReceipt.value) {
+        postPaymentReceipt.value = false;
+        lastPaymentMethod.value = null;
+        newSale();
+    }
 }
 
 function compItem(index) {
@@ -466,9 +487,37 @@ function moveItemToSeat(itemIndex, targetSeatIndex) {
     notify(`Item moved to ${seats.value[targetSeatIndex].name}`);
 }
 
+// ─── Price Management ───────────────────────────────────────
+function updateItemPrice(catIdx, itemIdx, newPrice) {
+    editableCategories.value[catIdx].items[itemIdx].price = parseFloat(newPrice) || 0;
+    notify('Price updated', 'success');
+}
+
+// ─── Employee Management ────────────────────────────────────
+function addEmployee(emp) {
+    employees.value.push(emp);
+    notify(`Employee ${emp.name} added`, 'success');
+}
+
+function updateEmployee(id, updates) {
+    const idx = employees.value.findIndex(e => e.id === id);
+    if (idx !== -1) {
+        employees.value[idx] = { ...employees.value[idx], ...updates };
+        notify('Employee updated', 'success');
+    }
+}
+
+function deleteEmployee(id) {
+    if (currentEmployee.value?.id === id) {
+        notify('Cannot delete the currently logged-in employee', 'error');
+        return;
+    }
+    employees.value = employees.value.filter(e => e.id !== id);
+    notify('Employee removed', 'success');
+}
+
 // ─── Keyboard shortcuts ─────────────────────────────────────
-function handleKeydown(e) {
-    if (!isLoggedIn.value) {
+function handleKeydown(e) {    if (!isLoggedIn.value) {
         if (e.key >= '0' && e.key <= '9') pressLoginDigit(e.key);
         else if (e.key === 'Backspace') backspaceLogin();
         else if (e.key === 'Enter') submitLogin();
@@ -495,51 +544,51 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
     <!-- ── Login Screen ─────────────────────────────────────── -->
     <div v-if="!isLoggedIn" class="h-screen w-screen bg-wolf-bg flex flex-col overflow-hidden select-none font-sans">
         <!-- Header -->
-        <div class="h-11 bg-wolf-bg-light border-b border-wolf-border flex items-center justify-between px-6 shrink-0">
-            <span class="text-wolf-gold font-bold text-sm tracking-widest uppercase">Wolfgang's POS</span>
-            <span class="text-wolf-text-muted text-xs font-mono">{{ formattedDate }} &bull; {{ formattedTime }}</span>
+        <div class="h-14 bg-wolf-bg-light border-b border-wolf-border flex items-center justify-between px-6 shrink-0">
+            <span class="text-wolf-gold font-bold text-base tracking-widest uppercase">Wolfgang's POS</span>
+            <span class="text-wolf-text-muted text-sm font-mono">{{ formattedDate }} &bull; {{ formattedTime }}</span>
         </div>
 
         <!-- Body -->
         <div class="flex-1 flex items-center justify-center p-8">
 
             <!-- Numpad -->
-            <div class="flex flex-col items-center gap-4">
-                <p class="text-wolf-text-muted text-[10px] font-semibold tracking-widest uppercase">Enter Employee #</p>
+            <div class="flex flex-col items-center gap-7">
+                <p class="text-wolf-text-muted text-base font-semibold tracking-widest uppercase">Enter Employee #</p>
 
                 <!-- Number display -->
-                <div class="w-56 bg-wolf-bg-card border border-wolf-border rounded-lg px-4 py-3 text-center">
-                    <div class="text-wolf-cream font-mono text-3xl font-bold tracking-[0.3em] min-h-[2.5rem] flex items-center justify-center">
+                <div class="w-96 bg-wolf-bg-card border border-wolf-border rounded-2xl px-6 py-5 text-center">
+                    <div class="text-wolf-cream font-mono text-5xl font-bold tracking-[0.3em] min-h-[4.5rem] flex items-center justify-center">
                         {{ loginInput || '\u00a0' }}
                     </div>
-                    <div class="h-4 mt-1">
-                        <span v-if="loginError" class="text-red-400 text-xs">{{ loginError }}</span>
-                        <span v-else-if="liveEmployee" class="text-wolf-gold text-xs">{{ liveEmployee.name }} &bull; {{ liveEmployee.role }}</span>
+                    <div class="h-7 mt-2">
+                        <span v-if="loginError" class="text-red-400 text-base">{{ loginError }}</span>
+                        <span v-else-if="liveEmployee" class="text-wolf-gold text-base">{{ liveEmployee.name }} &bull; {{ liveEmployee.role }}</span>
                     </div>
                 </div>
 
                 <!-- Numpad grid -->
-                <div class="grid grid-cols-3 gap-2 w-56">
+                <div class="grid grid-cols-3 gap-4 w-96">
                     <button
                         v-for="d in ['1','2','3','4','5','6','7','8','9']"
                         :key="d"
                         @click="pressLoginDigit(d)"
-                        class="bg-wolf-bg-elevated hover:bg-wolf-bg-card border border-wolf-border rounded-lg h-14 text-wolf-cream font-bold text-xl transition-all active:scale-95 pos-btn-press"
+                        class="bg-wolf-bg-elevated hover:bg-wolf-bg-card border border-wolf-border rounded-2xl h-24 text-wolf-cream font-bold text-3xl transition-all active:scale-95 pos-btn-press"
                     >{{ d }}</button>
 
                     <button
                         @click="backspaceLogin"
-                        class="bg-wolf-bg-elevated hover:bg-wolf-bg-card border border-wolf-border rounded-lg h-14 text-wolf-text-secondary transition-all active:scale-95 pos-btn-press flex items-center justify-center"
+                        class="bg-wolf-bg-elevated hover:bg-wolf-bg-card border border-wolf-border rounded-2xl h-24 text-wolf-text-secondary transition-all active:scale-95 pos-btn-press flex items-center justify-center"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
                     </button>
                     <button
                         @click="pressLoginDigit('0')"
-                        class="bg-wolf-bg-elevated hover:bg-wolf-bg-card border border-wolf-border rounded-lg h-14 text-wolf-cream font-bold text-xl transition-all active:scale-95 pos-btn-press"
+                        class="bg-wolf-bg-elevated hover:bg-wolf-bg-card border border-wolf-border rounded-2xl h-24 text-wolf-cream font-bold text-3xl transition-all active:scale-95 pos-btn-press"
                     >0</button>
                     <button
                         @click="submitLogin"
-                        class="bg-wolf-gold/20 hover:bg-wolf-gold/30 border border-wolf-gold/50 rounded-lg h-14 text-wolf-gold font-bold text-sm transition-all active:scale-95 pos-btn-press"
+                        class="bg-wolf-gold/20 hover:bg-wolf-gold/30 border border-wolf-gold/50 rounded-2xl h-24 text-wolf-gold font-bold text-xl transition-all active:scale-95 pos-btn-press"
                     >Enter</button>
                 </div>
             </div>
@@ -553,7 +602,16 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
         :currentSeatItems="currentSeatItems"
         :selectedOrderItem="selectedOrderItem"
         :subtotal="subtotal"
+        :tax="tax"
+        :gratuity="gratuity"
+        :discount="computedDiscount"
+        :amountDue="amountDue"
+        :orderType="orderType"
+        :tableNumber="currentTable"
+        :checkNumber="checkNumber"
+        :serverName="currentEmployee?.name || serverName || ''"
         :employees="employees"
+        :categories="editableCategories"
         :sessionChecks="sessionChecks"
         :sessionTotal="sessionTotal"
         :currentEmployee="currentEmployee"
@@ -563,13 +621,14 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
         @apply-discount="applyDiscount"
         @void-item="voidItem"
         @comp-item="compItem"
-        @open-tables="showTableModal = true"
-        @open-discounts="showDiscountModal = true"
         @recall-order="recallOrder"
         @delete-held="(id) => { heldOrders = heldOrders.filter(o => o.id !== id); notify('Held order deleted'); }"
         @open-drawer="notify('Cash drawer opened', 'success')"
-        @reprint="printCheck"
         @notify="notify"
+        @update-price="updateItemPrice"
+        @add-employee="addEmployee"
+        @update-employee="updateEmployee"
+        @delete-employee="deleteEmployee"
     />
 
     <!-- ── POS Terminal ──────────────────────────────────────── -->
@@ -601,7 +660,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
         </Transition>
 
         <!-- Top Info Bar -->
-        <div class="h-11 bg-wolf-bg-light border-b border-wolf-border flex items-center justify-between px-4 shrink-0">
+        <div class="h-14 bg-wolf-bg-light border-b border-wolf-border flex items-center justify-between px-4 shrink-0">
             <div class="flex items-center gap-4">
                 <span class="text-wolf-gold font-bold text-sm tracking-widest uppercase">Wolfgang's</span>
                 <div class="w-px h-5 bg-wolf-border"></div>
@@ -625,7 +684,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
         <div class="flex-1 flex overflow-hidden">
             <!-- Left: Category Sidebar -->
             <CategorySidebar
-                :categories="categories"
+                :categories="editableCategories"
                 :activeIndex="activeCategory"
                 @select="selectCategory"
             />
@@ -633,8 +692,8 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
             <!-- Center: Menu Grid -->
             <div class="flex-1 flex flex-col min-w-0">
                 <MenuGrid
-                    :items="categories[activeCategory]?.items || []"
-                    :categoryName="categories[activeCategory]?.name || ''"
+                    :items="editableCategories[activeCategory]?.items || []"
+                    :categoryName="editableCategories[activeCategory]?.name || ''"
                     @add-item="addItem"
                 />
                 <BottomBar
@@ -790,7 +849,10 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
             :tableNumber="currentTable"
             :checkNumber="checkNumber"
             :serverName="serverName"
-            @close="showReceiptModal = false"
+            :paymentMethod="lastPaymentMethod"
+            :afterPayment="postPaymentReceipt"
+            @close="closeReceipt"
+            @new-sale="closeReceipt"
         />
 
         <HeldOrdersModal

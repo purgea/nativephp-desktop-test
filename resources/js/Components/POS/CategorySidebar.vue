@@ -8,12 +8,12 @@ defineEmits(['select']);
 </script>
 
 <template>
-    <div class="w-32 bg-wolf-bg-light border-r border-wolf-border flex flex-col overflow-y-auto shrink-0">
+    <div class="w-52 bg-wolf-bg-light border-r border-wolf-border flex flex-col overflow-y-auto shrink-0">
         <button
             v-for="(category, index) in categories"
             :key="index"
             @click="$emit('select', index)"
-            class="relative px-2 py-3.5 text-[10px] font-bold text-center leading-tight uppercase tracking-wider transition-all duration-150 border-b border-wolf-border/50"
+            class="relative px-3 py-5 text-sm font-bold text-center leading-tight uppercase tracking-wider transition-all duration-150 border-b border-wolf-border/50 min-h-[68px]"
             :class="[
                 activeIndex === index
                     ? 'bg-wolf-bg-card text-wolf-gold shadow-inner'

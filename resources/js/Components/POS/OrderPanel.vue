@@ -42,7 +42,7 @@ function toggleMoveMenu(index) {
                 v-for="(item, index) in items"
                 :key="item.id"
                 @click="$emit('select', index)"
-                class="flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors duration-75 relative"
+                class="flex items-center gap-2.5 px-3 py-3.5 cursor-pointer transition-colors duration-75 relative min-h-[64px]"
                 :class="[
                     selectedIndex === index
                         ? 'bg-wolf-gold/10 border-l-[3px] border-wolf-gold'
@@ -52,7 +52,7 @@ function toggleMoveMenu(index) {
                 <!-- Qty Badge (tap to edit qty on selected item) -->
                 <button
                     @click.stop="selectedIndex === index ? $emit('change-qty', index) : $emit('select', index)"
-                    class="w-7 h-7 rounded flex items-center justify-center text-[10px] font-bold shrink-0 transition-all"
+                    class="w-11 h-11 rounded flex items-center justify-center text-sm font-bold shrink-0 transition-all"
                     :class="[
                         item.sent
                             ? (item.fired ? 'bg-red-900/40 text-red-400' : 'bg-emerald-900/40 text-emerald-400')
@@ -66,7 +66,7 @@ function toggleMoveMenu(index) {
 
                 <!-- Item Details -->
                 <div class="flex-1 min-w-0">
-                    <div class="text-[12px] font-medium text-wolf-cream truncate">{{ item.name }}</div>
+                    <div class="text-sm font-medium text-wolf-cream truncate">{{ item.name }}</div>
                     <div v-if="item.modifiers?.length" class="flex flex-wrap gap-1 mt-0.5">
                         <span
                             v-for="mod in item.modifiers"
@@ -85,7 +85,7 @@ function toggleMoveMenu(index) {
                 </div>
 
                 <!-- Price -->
-                <span class="text-[12px] font-mono font-semibold text-wolf-cream-dark shrink-0">
+                <span class="text-sm font-mono font-semibold text-wolf-cream-dark shrink-0">
                     ${{ (item.price * item.qty).toFixed(2) }}
                 </span>
 

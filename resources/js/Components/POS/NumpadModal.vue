@@ -51,7 +51,7 @@ const numKeys = [
 
 <template>
     <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" @click.self="$emit('close')">
-        <div class="bg-wolf-bg-card border border-wolf-border rounded-xl shadow-2xl w-80 overflow-hidden">
+        <div class="bg-wolf-bg-card border border-wolf-border rounded-xl shadow-2xl w-96 overflow-hidden">
             <!-- Header -->
             <div class="bg-wolf-bg-elevated px-5 py-3 border-b border-wolf-border flex items-center justify-between">
                 <h3 class="text-wolf-cream font-bold text-sm">{{ modeLabel }}</h3>
@@ -83,7 +83,7 @@ const numKeys = [
                             v-for="key in row"
                             :key="key"
                             @click="press(key)"
-                            class="bg-wolf-bg-elevated hover:bg-wolf-border border border-wolf-border rounded-lg py-3 text-lg font-bold text-wolf-cream transition-colors pos-btn-press"
+                            class="bg-wolf-bg-elevated hover:bg-wolf-border border border-wolf-border rounded-lg py-5 text-xl font-bold text-wolf-cream transition-colors pos-btn-press"
                         >
                             {{ key }}
                         </button>
@@ -92,13 +92,13 @@ const numKeys = [
 
                 <!-- Bottom row -->
                 <div class="grid grid-cols-3 gap-1.5 mt-1.5">
-                    <button @click="clear" class="bg-wolf-burgundy/30 hover:bg-wolf-burgundy/50 border border-wolf-burgundy/40 rounded-lg py-3 text-xs font-bold text-wolf-burgundy-light transition-colors pos-btn-press">
+                    <button @click="clear" class="bg-wolf-burgundy/30 hover:bg-wolf-burgundy/50 border border-wolf-burgundy/40 rounded-lg py-4 text-sm font-bold text-wolf-burgundy-light transition-colors pos-btn-press">
                         CLEAR
                     </button>
-                    <button @click="backspace" class="bg-wolf-bg-elevated hover:bg-wolf-border border border-wolf-border rounded-lg py-3 text-xs font-bold text-wolf-cream transition-colors pos-btn-press">
+                    <button @click="backspace" class="bg-wolf-bg-elevated hover:bg-wolf-border border border-wolf-border rounded-lg py-4 text-sm font-bold text-wolf-cream transition-colors pos-btn-press">
                         ← DEL
                     </button>
-                    <button @click="submit" class="bg-wolf-gold hover:bg-wolf-gold-light rounded-lg py-3 text-xs font-bold text-wolf-bg transition-colors pos-btn-press">
+                    <button @click="submit" class="bg-wolf-gold hover:bg-wolf-gold-light rounded-lg py-4 text-sm font-bold text-wolf-bg transition-colors pos-btn-press">
                         ENTER
                     </button>
                 </div>

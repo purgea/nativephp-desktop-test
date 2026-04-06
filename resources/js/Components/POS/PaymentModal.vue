@@ -151,49 +151,49 @@ const quickCash = computed(() => {
 
 <template>
     <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" @click.self="$emit('close')">
-        <div class="bg-wolf-bg-card border border-wolf-border rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div class="bg-wolf-bg-card border border-wolf-border rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[92vh]">
             <!-- Header -->
-            <div class="bg-wolf-bg-elevated px-5 py-3 border-b border-wolf-border flex items-center justify-between">
-                <h3 class="text-wolf-cream font-bold text-base">Settle Check</h3>
-                <button @click="$emit('close')" class="text-wolf-text-muted hover:text-wolf-cream text-xl leading-none">&times;</button>
+            <div class="bg-wolf-bg-elevated px-6 py-5 border-b border-wolf-border flex items-center justify-between shrink-0">
+                <h3 class="text-wolf-cream font-bold text-xl">Settle Check</h3>
+                <button @click="$emit('close')" class="text-wolf-text-muted hover:text-wolf-cream text-3xl leading-none w-12 h-12 flex items-center justify-center">&times;</button>
             </div>
 
-            <div class="p-4 space-y-4">
+            <div class="p-5 space-y-5 overflow-y-auto flex-1">
                 <!-- Amount -->
-                <div class="bg-wolf-bg rounded-lg border border-wolf-border p-4 text-center">
-                    <div class="text-wolf-text-muted text-xs uppercase tracking-wider mb-1">Amount Due</div>
-                    <div class="text-3xl font-black text-wolf-gold font-mono">${{ amountDue.toFixed(2) }}</div>
+                <div class="bg-wolf-bg rounded-xl border border-wolf-border p-6 text-center">
+                    <div class="text-wolf-text-muted text-sm uppercase tracking-wider mb-2">Amount Due</div>
+                    <div class="text-6xl font-black text-wolf-gold font-mono">${{ amountDue.toFixed(2) }}</div>
                 </div>
 
                 <!-- Payment Method -->
                 <div>
-                    <div class="text-wolf-text-muted text-[10px] uppercase tracking-wider font-semibold mb-2">Payment Method</div>
-                    <div class="grid grid-cols-4 gap-1.5">
+                    <div class="text-wolf-text-muted text-xs uppercase tracking-wider font-semibold mb-3">Payment Method</div>
+                    <div class="grid grid-cols-4 gap-3">
                         <button
                             v-for="m in methods"
                             :key="m.key"
                             @click="selectMethod(m.key)"
-                            class="rounded-lg py-3 text-center border transition-all pos-btn-press"
+                            class="rounded-xl py-5 text-center border transition-all pos-btn-press"
                             :class="selectedMethod === m.key
                                 ? 'bg-wolf-gold/15 border-wolf-gold text-wolf-gold'
                                 : 'bg-wolf-bg-elevated border-wolf-border text-wolf-cream-dark hover:border-wolf-gold/50'
                             "
                         >
-                            <span class="block text-lg mb-0.5">{{ m.icon }}</span>
-                            <span class="text-[9px] font-bold">{{ m.label }}</span>
+                            <span class="block text-3xl mb-1">{{ m.icon }}</span>
+                            <span class="text-xs font-bold">{{ m.label }}</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Tip -->
                 <div>
-                    <div class="text-wolf-text-muted text-[10px] uppercase tracking-wider font-semibold mb-2">Gratuity</div>
-                    <div class="grid grid-cols-6 gap-1">
+                    <div class="text-wolf-text-muted text-xs uppercase tracking-wider font-semibold mb-3">Gratuity</div>
+                    <div class="grid grid-cols-3 gap-2">
                         <button
                             v-for="pct in tipOptions"
                             :key="pct"
                             @click="selectTip(pct)"
-                            class="rounded py-2 text-[10px] font-bold border transition-all pos-btn-press"
+                            class="rounded-xl py-4 text-sm font-bold border transition-all pos-btn-press"
                             :class="tipPercent === pct && !customTip
                                 ? 'bg-wolf-gold/15 border-wolf-gold text-wolf-gold'
                                 : 'bg-wolf-bg-elevated border-wolf-border text-wolf-cream-dark hover:border-wolf-gold/50'
@@ -202,21 +202,21 @@ const quickCash = computed(() => {
                             {{ pct }}%
                         </button>
                     </div>
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="text-wolf-text-muted text-xs">Custom:</span>
+                    <div class="flex items-center gap-3 mt-3">
+                        <span class="text-wolf-text-muted text-sm">Custom:</span>
                         <div class="flex-1 relative">
-                            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-wolf-gold text-xs">$</span>
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-wolf-gold text-sm">$</span>
                             <input
                                 v-model="customTip"
                                 type="number"
                                 step="0.01"
                                 min="0"
                                 placeholder="0.00"
-                                class="w-full bg-wolf-bg border border-wolf-border rounded-lg pl-6 pr-3 py-1.5 text-sm text-wolf-cream font-mono focus:border-wolf-gold focus:ring-1 focus:ring-wolf-gold/30 outline-none"
+                                class="w-full bg-wolf-bg border border-wolf-border rounded-xl pl-8 pr-3 py-3.5 text-base text-wolf-cream font-mono focus:border-wolf-gold focus:ring-1 focus:ring-wolf-gold/30 outline-none"
                                 @input="tipPercent = 0"
                             />
                         </div>
-                        <div class="text-wolf-gold text-sm font-bold font-mono min-w-[60px] text-right">${{ tipAmount.toFixed(2) }}</div>
+                        <div class="text-wolf-gold text-base font-bold font-mono min-w-[72px] text-right">${{ tipAmount.toFixed(2) }}</div>
                     </div>
                 </div>
 
@@ -225,19 +225,19 @@ const quickCash = computed(() => {
                     <div class="text-wolf-text-muted text-[10px] uppercase tracking-wider font-semibold mb-2">Gift Card Serial / QR Code</div>
 
                     <!-- Lookup input -->
-                    <div v-if="!giftCardLookedUp" class="space-y-2">
-                        <div class="flex gap-2">
+                    <div v-if="!giftCardLookedUp" class="space-y-3">
+                        <div class="flex gap-3">
                             <input
                                 v-model="giftCardInput"
                                 type="text"
                                 placeholder="e.g. WG-1001-2024"
-                                class="flex-1 bg-wolf-bg border border-wolf-border rounded-lg px-3 py-2 text-sm text-wolf-cream font-mono uppercase tracking-wider placeholder:text-wolf-text-muted/40 focus:border-wolf-gold focus:ring-1 focus:ring-wolf-gold/30 outline-none"
+                                class="flex-1 bg-wolf-bg border border-wolf-border rounded-xl px-4 py-3.5 text-base text-wolf-cream font-mono uppercase tracking-wider placeholder:text-wolf-text-muted/40 focus:border-wolf-gold focus:ring-1 focus:ring-wolf-gold/30 outline-none"
                                 @keydown.enter="lookupGiftCard"
                             />
                             <button
                                 @click="lookupGiftCard"
                                 :disabled="giftCardSearching"
-                                class="px-4 py-2 rounded-lg text-xs font-bold transition-all pos-btn-press bg-wolf-gold/15 border border-wolf-gold/40 text-wolf-gold hover:bg-wolf-gold/25 disabled:opacity-50"
+                                class="px-6 py-3.5 rounded-xl text-sm font-bold transition-all pos-btn-press bg-wolf-gold/15 border border-wolf-gold/40 text-wolf-gold hover:bg-wolf-gold/25 disabled:opacity-50"
                             >
                                 {{ giftCardSearching ? '...' : 'Lookup' }}
                             </button>
@@ -294,20 +294,20 @@ const quickCash = computed(() => {
 
                 <!-- Cash Tendered -->
                 <div v-if="selectedMethod === 'cash'">
-                    <div class="text-wolf-text-muted text-[10px] uppercase tracking-wider font-semibold mb-2">Cash Tendered</div>
+                    <div class="text-wolf-text-muted text-xs uppercase tracking-wider font-semibold mb-3">Cash Tendered</div>
                     <input
                         v-model="cashTendered"
                         type="number"
                         step="0.01"
                         :placeholder="finalTotal.toFixed(2)"
-                        class="w-full bg-wolf-bg border border-wolf-border rounded-lg px-3 py-2 text-lg text-wolf-cream font-mono text-center focus:border-wolf-gold focus:ring-1 focus:ring-wolf-gold/30 outline-none mb-2"
+                        class="w-full bg-wolf-bg border border-wolf-border rounded-xl px-4 py-4 text-2xl text-wolf-cream font-mono text-center focus:border-wolf-gold focus:ring-1 focus:ring-wolf-gold/30 outline-none mb-3"
                     />
-                    <div class="grid grid-cols-6 gap-1">
+                    <div class="grid grid-cols-3 gap-2">
                         <button
                             v-for="val in quickCash"
                             :key="val"
                             @click="cashTendered = val.toString()"
-                            class="bg-wolf-bg-elevated border border-wolf-border rounded py-1.5 text-[10px] font-bold text-wolf-cream-dark hover:border-wolf-gold/50 transition-colors pos-btn-press"
+                            class="bg-wolf-bg-elevated border border-wolf-border rounded-xl py-4 text-sm font-bold text-wolf-cream-dark hover:border-wolf-gold/50 transition-colors pos-btn-press"
                         >
                             ${{ val }}
                         </button>
@@ -319,21 +319,21 @@ const quickCash = computed(() => {
                 </div>
 
                 <!-- Total Line -->
-                <div class="bg-wolf-bg rounded-lg border border-wolf-gold/30 p-3 flex items-center justify-between">
-                    <span class="text-wolf-cream font-semibold text-sm">Final Total</span>
-                    <span class="text-wolf-gold text-xl font-black font-mono">${{ finalTotal.toFixed(2) }}</span>
+                <div class="bg-wolf-bg rounded-xl border border-wolf-gold/30 p-5 flex items-center justify-between">
+                    <span class="text-wolf-cream font-semibold text-base">Final Total</span>
+                    <span class="text-wolf-gold text-3xl font-black font-mono">${{ finalTotal.toFixed(2) }}</span>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="bg-wolf-bg-elevated px-5 py-3 border-t border-wolf-border flex justify-end gap-2">
-                <button @click="$emit('close')" class="px-4 py-2.5 text-xs font-bold text-wolf-text-muted hover:text-wolf-cream bg-wolf-bg-card border border-wolf-border rounded-lg transition-colors">
+            <div class="bg-wolf-bg-elevated px-6 py-5 border-t border-wolf-border flex justify-end gap-3 shrink-0">
+                <button @click="$emit('close')" class="px-6 py-4 text-sm font-bold text-wolf-text-muted hover:text-wolf-cream bg-wolf-bg-card border border-wolf-border rounded-xl transition-colors min-w-[120px]">
                     Cancel
                 </button>
                 <button
                     @click="pay"
                     :disabled="!canPay"
-                    class="px-8 py-2.5 text-sm font-bold rounded-lg transition-colors pos-btn-press"
+                    class="px-10 py-4 text-base font-bold rounded-xl transition-colors pos-btn-press min-w-[220px]"
                     :class="canPay
                         ? 'text-wolf-bg bg-wolf-gold hover:bg-wolf-gold-light'
                         : 'text-wolf-text-muted bg-wolf-bg-elevated border border-wolf-border cursor-not-allowed'

@@ -30,18 +30,18 @@ function itemBgClass(color) {
 
         <!-- Items Grid -->
         <div class="flex-1 overflow-y-auto p-3">
-            <div class="grid grid-cols-5 gap-2 auto-rows-min">
+            <div class="grid grid-cols-3 gap-2.5 auto-rows-min">
                 <button
                     v-for="(item, index) in items"
                     :key="index"
                     @click="$emit('addItem', item)"
-                    class="relative rounded-lg p-2 min-h-[76px] flex flex-col items-center justify-center text-center shadow-lg transition-all duration-100 ring-1 ring-inset pos-btn-press"
+                    class="relative rounded-lg p-3 min-h-[120px] flex flex-col items-center justify-center text-center shadow-lg transition-all duration-100 ring-1 ring-inset pos-btn-press"
                     :class="itemBgClass(item.color)"
                 >
-                    <span class="text-[11px] font-bold leading-tight text-white/95 drop-shadow-sm">
+                    <span class="text-sm font-bold leading-tight text-white/95 drop-shadow-sm">
                         {{ item.name }}
                     </span>
-                    <span class="text-[10px] mt-1.5 text-white/50 font-mono font-semibold">
+                    <span class="text-sm mt-2 text-white/60 font-mono font-semibold">
                         ${{ item.price.toFixed(2) }}
                     </span>
                 </button>

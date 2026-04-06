@@ -13,7 +13,7 @@ defineEmits(['select', 'addSeat', 'removeSeat']);
             v-for="(seat, index) in seats"
             :key="seat.id"
             @click="$emit('select', index)"
-            class="flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors border-b-2 relative group"
+            class="flex-1 px-3 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 relative group min-h-[56px]"
             :class="[
                 activeSeat === index
                     ? 'text-wolf-gold bg-wolf-bg-elevated/50 border-wolf-gold'
@@ -21,7 +21,7 @@ defineEmits(['select', 'addSeat', 'removeSeat']);
             ]"
         >
             {{ seat.name }}
-            <span v-if="seat.items.length" class="ml-1 text-[8px] bg-wolf-bg-elevated text-wolf-text-secondary px-1 py-0.5 rounded border border-wolf-border">
+            <span v-if="seat.items.length" class="ml-1 text-[9px] bg-wolf-bg-elevated text-wolf-text-secondary px-1 py-0.5 rounded border border-wolf-border">
                 {{ seat.items.length }}
             </span>
             <!-- Remove seat button (on hover, non-active empty seats) -->
